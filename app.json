@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Archer AI",
+    "slug": "archer-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#03110f",
+    "splash": { "backgroundColor": "#03110f" },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.archer.ai" },
+    "android": { "package": "com.archer.ai", "adaptiveIcon": { "backgroundColor": "#03110f" } }
+  }
+}
