@@ -4,6 +4,7 @@
     "slug": "archer-ai",
     "version": "1.0.0",
     "orientation": "portrait",
+    "platforms": ["ios", "android"],
     "userInterfaceStyle": "dark",
     "backgroundColor": "#03110f",
     "splash": { "backgroundColor": "#03110f" },
