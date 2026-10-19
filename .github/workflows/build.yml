@@ -1,0 +1,86 @@
+name: Build Archer AI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      eas_build:
+        description: 'Also run a cloud build with EAS (needs EXPO_TOKEN secret)'
+        type: boolean
+        default: false
+      platform:
+        description: 'EAS platform'
+        type: choice
+        options: [android, ios, all]
+        default: android
+
+jobs:
+  build:
+    name: Install and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package.json', 'package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check Expo dependency versions
+        run: npx expo-doctor
+        continue-on-error: true
+
+      - name: Build (export JS bundles for Android and iOS)
+        run: npx expo export --platform all
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: archer-ai-export
+          path: dist/
+          retention-days: 7
+
+  eas-build:
+    name: EAS cloud build (optional)
+    needs: build
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.eas_build }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build with EAS
+        run: eas build --platform ${{ inputs.platform }} --profile preview --non-interactive --no-wait
+        
