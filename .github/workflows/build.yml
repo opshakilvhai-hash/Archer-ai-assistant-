@@ -47,7 +47,7 @@ jobs:
         continue-on-error: true
 
       - name: Build (export JS bundles for Android and iOS)
-        run: npx expo export --platform all
+        run: npx expo export --platform android --platform ios
 
       - name: Upload build output
         uses: actions/upload-artifact@v4
@@ -83,4 +83,3 @@ jobs:
 
       - name: Build with EAS
         run: eas build --platform ${{ inputs.platform }} --profile preview --non-interactive --no-wait
-        
